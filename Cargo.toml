@@ -1,0 +1,5 @@
+[package]
+name = "chip8_assembler"
+version = "0.1.0"
+authors = ["Joshua Suskalo <joshua@suskalo.org>"]
+edition = "2018"
