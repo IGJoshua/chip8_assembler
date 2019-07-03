@@ -136,64 +136,80 @@ fn parse_instruction(line: &str, labels: &HashMap<String, u16>) -> Result<Instru
         static ref SYS: Regex = Regex::new("^\\s*SYS (?P<addr>\\S+)\\s*(;.*)?$").unwrap();
         static ref JMP: Regex = Regex::new("^\\s*JP (?P<addr>\\S+)\\s*(;.*)?$").unwrap();
         static ref CALL: Regex = Regex::new("^\\s*CALL (?P<addr>\\S+)\\s*(;.*)?$").unwrap();
-        static ref SKIP_EQ: Regex =
-            Regex::new("^\\s*SE V(?P<Vx>[0-9a-f]), (?P<const>[0-9a-f]{1,2})\\s*(;.*)?$").unwrap();
-        static ref SKIP_NOT_EQ: Regex =
-            Regex::new("^\\s*SNE V(?P<Vx>[0-9a-f]), (?P<const>[0-9a-f]{1,2})\\s*(;.*)?$").unwrap();
+        static ref SKIP_EQ: Regex = Regex::new(
+            "^\\s*SE V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)(?P<const>[0-9a-fA-F]{1,2})\\s*(;.*)?$"
+        )
+        .unwrap();
+        static ref SKIP_NOT_EQ: Regex = Regex::new(
+            "^\\s*SNE V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)(?P<const>[0-9a-fA-F]{1,2})\\s*(;.*)?$"
+        )
+        .unwrap();
         static ref SKIP_EQ_VX: Regex =
-            Regex::new("^\\s*SE V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
-        static ref LOAD: Regex =
-            Regex::new("^\\s*LD V(?P<Vx>[0-9a-f]), (?P<const>[0-9a-f]{1,2})\\s*(;.*)?$").unwrap();
-        static ref ADD: Regex =
-            Regex::new("^\\s*ADD V(?P<Vx>[0-9a-f]), (?P<const>[0-9a-f]{1,2})\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*SE V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
+        static ref LOAD: Regex = Regex::new(
+            "^\\s*LD V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)(?P<const>[0-9a-fA-F]{1,2})\\s*(;.*)?$"
+        )
+        .unwrap();
+        static ref ADD: Regex = Regex::new(
+            "^\\s*ADD V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)(?P<const>[0-9a-fA-F]{1,2})\\s*(;.*)?$"
+        )
+        .unwrap();
         static ref LOAD_VX: Regex =
-            Regex::new("^\\s*LD V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*LD V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
         static ref OR: Regex =
-            Regex::new("^\\s*OR V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*OR V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
         static ref AND: Regex =
-            Regex::new("^\\s*AND V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*AND V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
         static ref XOR: Regex =
-            Regex::new("^\\s*XOR V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*XOR V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
         static ref ADD_VX: Regex =
-            Regex::new("^\\s*ADD V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*ADD V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
         static ref SUB_VX: Regex =
-            Regex::new("^\\s*SUB V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*SUB V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
         static ref SHIFT_RIGHT: Regex =
-            Regex::new("^\\s*SHR V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*SHR V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref SUBN: Regex =
-            Regex::new("^\\s*SUBN V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*SUBN V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$")
+                .unwrap();
     }
     lazy_static! {
-        static ref SHIFT_LEFT: Regex = Regex::new("^\\s*SHL V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+        static ref SHIFT_LEFT: Regex = Regex::new("^\\s*SHL V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref SKIP_NOT_EQ_VX: Regex =
-            Regex::new("^\\s*SNE V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f])\\s*(;.*)?$").unwrap();
-        static ref LOAD_I: Regex = Regex::new("^\\s*LD I, (?P<addr>\\S+)\\s*(;.*)?$").unwrap();
-        static ref JUMP_V0: Regex = Regex::new("^\\s*JP V0, (?P<addr>\\S+)\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*SNE V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
+        static ref LOAD_I: Regex = Regex::new("^\\s*LD I(,\\s*|\\s+)(?P<addr>\\S+)\\s*(;.*)?$").unwrap();
+        static ref JUMP_V0: Regex = Regex::new("^\\s*JP V0(,\\s*|\\s+)(?P<addr>\\S+)\\s*(;.*)?$").unwrap();
         static ref RAND: Regex =
-            Regex::new("^\\s*RND V(?P<Vx>[0-9a-f]), (?P<const>[0-9a-f]{1,2})\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*RND V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)(?P<const>[0-9a-fA-F]{1,2})\\s*(;.*)?$").unwrap();
         static ref DRAW: Regex = Regex::new(
-            "^\\s*DRW V(?P<Vx>[0-9a-f]), V(?P<Vy>[0-9a-f]), (?P<const>[0-9a-f])\\s*(;.*)?$"
+            "^\\s*DRW V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)V(?P<Vy>[0-9a-fA-F])(,\\s*|\\s+)(?P<const>[0-9a-fA-F])\\s*(;.*)?$"
         )
         .unwrap();
         static ref SKIP_KEY_PRESSED: Regex =
-            Regex::new("^\\s*SKP V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*SKP V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref SKIP_KEY_NOT_PRESSED: Regex =
-            Regex::new("^\\s*SKNP V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*SKNP V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref LOAD_DELAY: Regex =
-            Regex::new("^\\s*LD V(?P<Vx>[0-9a-f]), DT\\s*(;.*)?$").unwrap();
-        static ref LOAD_KEY: Regex = Regex::new("^\\s*LD V(?P<Vx>[0-9a-f]), K\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*LD V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)DT\\s*(;.*)?$").unwrap();
+        static ref LOAD_KEY: Regex = Regex::new("^\\s*LD V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)K\\s*(;.*)?$").unwrap();
         static ref SET_DELAY: Regex =
-            Regex::new("^\\s*LD DT, V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*LD DT(,\\s*|\\s+)V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref SET_SOUND: Regex =
-            Regex::new("^\\s*LD ST, V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
-        static ref ADD_I: Regex = Regex::new("^\\s*ADD I, V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*LD ST(,\\s*|\\s+)V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
+        static ref ADD_I: Regex = Regex::new("^\\s*ADD I(,\\s*|\\s+)V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref LOAD_FONT: Regex =
-            Regex::new("^\\s*LD F, V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
-        static ref LOAD_BCD: Regex = Regex::new("^\\s*LD B, V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*LD F(,\\s*|\\s+)V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
+        static ref LOAD_BCD: Regex = Regex::new("^\\s*LD B(,\\s*|\\s+)V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref STORE_REGISTERS: Regex =
-            Regex::new("^\\s*LD \\[I\\], V(?P<Vx>[0-9a-f])\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*LD \\[I\\](,\\s*|\\s+)V(?P<Vx>[0-9a-fA-F])\\s*(;.*)?$").unwrap();
         static ref LOAD_REGISTERS: Regex =
-            Regex::new("^\\s*LD V(?P<Vx>[0-9a-f]), \\[I\\]\\s*(;.*)?$").unwrap();
+            Regex::new("^\\s*LD V(?P<Vx>[0-9a-fA-F])(,\\s*|\\s+)\\[I\\]\\s*(;.*)?$").unwrap();
     }
 
     return if CLS.is_match(line) {
