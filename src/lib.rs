@@ -632,7 +632,7 @@ fn assemble_instruction(instr: Instruction) -> AssembledInstruction {
             AssembledInstruction(construct_byte(0x01, (addr.0 >> 8) as u8), addr.0 as u8)
         }
         Instruction::Call(addr) => {
-            AssembledInstruction(construct_byte(0x01, (addr.0 >> 8) as u8), addr.0 as u8)
+            AssembledInstruction(construct_byte(0x02, (addr.0 >> 8) as u8), addr.0 as u8)
         }
         Instruction::SkipEq(vx, constant) => {
             AssembledInstruction(construct_byte(0x03, vx.0), constant)
